@@ -1,15 +1,5 @@
 <?php
-    // $localhost="localhost";
-    // $user="root";
-    // $pass="";
-    // $db="graficos";
-
-    // $conexion=mysqli_connect($localhost,$root,$pass,$db);
-    // if(!$conexion){
-    //     echo"exito";
-    // }else{
-    //     echo"error";
-    // }
+    
     class conexion{
 		private $servidor;
 		private $usuario;
@@ -17,6 +7,11 @@
 		private $basedatos;
 		public $conexion;
 		public function __construct(){
+			// $this->servidor = "127.0.0.1:3306";
+			// $this->usuario = "u192920621_graficos";
+			// $this->contrasena = "Avp21197.";
+			// $this->basedatos = "u192920621_graficos_ajax";
+
 		    $this->servidor = "127.0.0.1";
 			$this->usuario = "root";
 			$this->contrasena = "";

@@ -22,6 +22,76 @@ function cargardatosgaficobar(){
         
     })
 }
+function  gaficobar_polarArea(){
+
+    //   alert("entro1");
+    $.ajax({
+        url:'php/controlador_grafico.php',
+        type:'post'
+    }).done(function(resp){
+        // alert("entro2");
+        if(resp.length>0){
+            var titulo=[];
+            var cantidad=[]; 
+            var colores=[];
+            var data= JSON.parse(resp);
+            for(var i=0 ;i<data.length; i++){
+                titulo.push(data[i][1]);
+                cantidad.push(data[i][2]);
+                colores.push(colorRGB());
+
+            }
+            creargrafico(titulo,cantidad,colores,'polarArea','GRAFICO POLARAREA DE PRODUCTOS','gaficobarpolarArea');
+        } 
+    })
+}
+
+function  gaficobar_line(){
+
+    //   alert("entro1");
+    $.ajax({
+        url:'php/controlador_grafico.php',
+        type:'post'
+    }).done(function(resp){
+        // alert("entro2");
+        if(resp.length>0){
+            var titulo=[];
+            var cantidad=[]; 
+            var colores=[];
+            var data= JSON.parse(resp);
+            for(var i=0 ;i<data.length; i++){
+                titulo.push(data[i][1]);
+                cantidad.push(data[i][2]);
+                colores.push(colorRGB());
+
+            }
+            creargrafico(titulo,cantidad,colores,'line','GRAFICO POLARAREA DE PRODUCTOS','gaficoline');
+        } 
+    })
+}
+function  gafico_bubble(){
+
+    //   alert("entro1");
+    $.ajax({
+        url:'php/controlador_grafico.php',
+        type:'post'
+    }).done(function(resp){
+        // alert("entro2");
+        if(resp.length>0){
+            var titulo=[];
+            var cantidad=[]; 
+            var colores=[];
+            var data= JSON.parse(resp);
+            for(var i=0 ;i<data.length; i++){
+                titulo.push(data[i][1]);
+                cantidad.push(data[i][2]);
+                colores.push(colorRGB());
+
+            }
+            creargrafico(titulo,cantidad,colores,'bubble','GRAFICO POLARAREA DE PRODUCTOS','gaficobubble');
+        } 
+    })
+}
 
 function cargardatosgaficobarradar(){
     //   alert("entro1");
@@ -73,6 +143,14 @@ function cargardatosgaficopie(){
  
     })
 }
+function grafico_general(){
+cargardatosgaficobar(); 
+cargardatosgaficobarradar();
+cargardatosgaficopie();
+gaficobar_polarArea();
+gaficobar_line();
+gafico_bubble();
+}
 ///////////////crear graficos general//////////////////////////////////////
 function creargrafico(titulo,cantidad,colores,tipo,encabezado,id){
     var ctx = document.getElementById(id);
@@ -81,26 +159,63 @@ function creargrafico(titulo,cantidad,colores,tipo,encabezado,id){
     var myChart = new Chart(ctx,{
         type: tipo,///aca es el tipo de grafico
         data: {
-            labels: titulo,///aca se pone los titulos de los campos de la base de datoos
+            labels: titulo,
+            ///aca se pone los titulos de los campos de la base de datoos
             datasets: [{
                 label: encabezado,///aca se pone el encabezado
                 data: cantidad,///aca se pone  la cantidad de valores quee tiene cada titulo
                 backgroundColor:colores,
                 borderColor:colores,
                 borderWidth: 1
+                
+               
             }]
+            
+            
         },
+        
         options: {
+            legend: {
+                labels: {
+                    fontColor: "#fff",
+                    fontSize: 13
+                }
+            },
             scales: {
+                xAxes: [{
+                  time: {
+                    unit: 'date'
+                  },
+                  gridLines: {
+                    display: false,
+                    drawBorder: false
+                  },
+                  ticks: {
+                    fontColor : "#fff", //Color eje X
+                    maxTicksLimit: 7
+                  }
+                }],
                 yAxes: [{
                     ticks: {
-                        beginAtZero: true
-                    }
-                }]
+                    fontColor : "#fff", //Color eje Y
+                      maxTicksLimit: 5,
+                      padding: 10,
+                    },
+                    gridLines: {
+                      color: "rgb(234, 236, 244)",
+                      zeroLineColor: "rgb(234, 236, 244)",
+                      drawBorder: false,
+                      borderDash: [2],
+                      zeroLineBorderDash: [2]
+                    },
+                    
+                  }],
+                 
             }
         }
+        
     });
- 
+   
    
 }
 
@@ -118,61 +233,114 @@ function colorRGB(){
     function cargarchart_general_PARAMETROS(){
         cargardatosgaficodoughnut();
         gaficobarpolarArea();
-        gaficoradar()
+        gaficoradar();
+        Limpiarinput();
     }
+
+
+
     ///////////////trae la  busqueda por fecha/////////////////////////////////
-    function traermes(){
-        var mifecha = new Date();
-        // var anio = mifecha.getFullYear();
-        var anio = mifecha.getMonth();
-        var cadena="";
-        var numeromes=['fecha por mes','enero','frebrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
-        for(var i=0+1;i<anio+5;i++){
-            cadena+="<option  value="+i+">"+numeromes[i]+"</option>";
-        }
-        $("#fecha_inicio").html(cadena);
-        
-
-        $("#fecha_fin").html(cadena);
-        
-    }
     function traeranio(){
-        var mifecha = new Date();
-        var anio = mifecha.getFullYear();
-        var cadena="";
-        for(var i=2015;i<anio+1;i++){
-            cadena+="<option  value="+i+">"+i+"</option>";
-        }
-        $("#anio_inicio").html(cadena);
-        
+        $(function(){
+            $("#fecha_inicio").on('change', function(){
+                var fechainicio =$("#fecha_inicio").val();
+                var fechafin =$("#fecha_fin").val();
+                $.ajax({
+                    url:'php/controlador_grafico_parametro.php',
+                    type:'POST',
+                    data:{
+                        inicio:fechainicio,
+                        fin:fechafin
+                    },success: function(datos){
+                        $("#fecha_inicio").html(datos);
+                        $("#fecha_fin").html(datos);
+                        
+                    }
+                   
+                })
+            });
 
-        $("#anio_fin").html(cadena);
+            $("#fecha_fin").on('change', function(){
+                var fechainicio =$("#fecha_inicio").val();
+                var fechafin =$("#fecha_fin").val();
+                $.ajax({
+                    url:'php/controlador_grafico_parametro.php',
+                    type:'POST',
+                    data:{
+                        inicio:fechainicio,
+                        fin:fechafin
+                    },success: function(datos){
+                        $("#fecha_inicio").html(datos);
+                        $("#fecha_fin").html(datos);
+                        
+                    }
+                })
+            })
+           
+        });
         
     }
+function traermes(){
+    ///////////corresponde a la busqueda de los meses
+   
+        var mifecha = new Date();
+        // var mifecha1 = new Date();
+        var mes = mifecha.getMonth();
+        // var anio = mifecha1.getFullYear();
+        var cadena="";
+        // var cadena1="";
+        var numeromes=['fecha por mes','enero','frebrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+        for(var i=0;i<mes+5;i++){
+            Limpiarinput();
+            cadena+="<option type='date' value="+i+">"+numeromes[i]+"</option>";
+            
+        }
+        $("#mes_inicio").html(cadena);
+        $("#mes_fin").html(cadena);
+}
+function Limpiarinput(){
+    // $("#fecha_inicio").val("");
+    // $("#fecha_fin").val("");
+    // $("#mes_inicio").val("");
+    // $("#mes_fin").val("");
+    var elementos = document.getElementsByTagName('input');
+    limpiar.onclick = (e)=> { 
+    e.preventDefault();
+    for (let i = 0; i < elementos.length; i++) {
+        elementos[i].value='';          
+    }
+    }
 
-    // $('.date').datepicker({
-    //     multidate: true,
-    //       format: 'dd-mm-yyyy'
-    //   });
-      
-
+    $(document).ready(function() {
+        $('#mes_inicio').select2({
+        // placeholder: "Select Category",
+        allowClear: true, // This is for clear get the clear button if wanted
+        });
+        $('#mes_fin').select2({
+            // placeholder: "Select Category",
+            allowClear: true, // This is for clear get the clear button if wanted
+            });
+        });
+}
+    
     function cargardatosgaficodoughnut(){
         var fechainicio =$("#fecha_inicio").val();
         var fechafin =$("#fecha_fin").val();
-        var anio_inicio =$("#anio_inicio").val();
-        var anio_fin =$("#anio_fin").val();
-        //   alert("entro1");
+        var mesinicio =$("#mes_inicio").val();
+        var mesfin =$("#mes_fin").val();
+
         $.ajax({
             url:'php/controlador_grafico_parametro.php',
             type: 'post',
             data:{
                 inicio:fechainicio,
                 fin:fechafin,
-                anioinicio:anio_inicio,
-                aniofin:anio_fin
+                m_inicio:mesinicio,
+                m_fin:mesfin
+
             }
         }).done(function(resp){
-            // alert("entro2");
+            //  alert(resp);
             if(resp.length>0){
                 var titulo=[];
                 var cantidad=[]; 
@@ -189,24 +357,23 @@ function colorRGB(){
         })
     }
     
-
     function  gaficobarpolarArea(){
         var fechainicio =$("#fecha_inicio").val();
         var fechafin =$("#fecha_fin").val();
-        var anio_inicio =$("#anio_inicio").val();
-        var anio_fin =$("#anio_fin").val();
-        //   alert("entro1");
+        var mesinicio =$("#mes_inicio").val();
+        var mesfin =$("#mes_fin").val();
+
         $.ajax({
             url:'php/controlador_grafico_parametro.php',
             type: 'post',
             data:{
                 inicio:fechainicio,
                 fin:fechafin,
-                anioinicio:anio_inicio,
-                aniofin:anio_fin
+                m_inicio:mesinicio,
+                m_fin:mesfin
+
             }
         }).done(function(resp){
-            // alert("entro2");
             if(resp.length>0){
                 var titulo=[];
                 var cantidad=[]; 
@@ -226,17 +393,18 @@ function colorRGB(){
     function  gaficoradar(){
         var fechainicio =$("#fecha_inicio").val();
         var fechafin =$("#fecha_fin").val();
-        var anio_inicio =$("#anio_inicio").val();
-        var anio_fin =$("#anio_fin").val();
-        //   alert("entro1");
+        var mesinicio =$("#mes_inicio").val();
+        var mesfin =$("#mes_fin").val();
+
         $.ajax({
             url:'php/controlador_grafico_parametro.php',
             type: 'post',
             data:{
                 inicio:fechainicio,
                 fin:fechafin,
-                anioinicio:anio_inicio,
-                aniofin:anio_fin
+                m_inicio:mesinicio,
+                m_fin:mesfin
+
             }
         }).done(function(resp){
             // alert("entro2");
@@ -260,8 +428,6 @@ function colorRGB(){
     ///////////////// modal registro 
     function AbrirmodalRegistro(){
         $('#modal_registro').modal('show');
-
-
     }
 
 
@@ -302,3 +468,47 @@ function colorRGB(){
     
     }
     // &///////////////////
+
+    // ////////////////////databale y bd
+var table;
+function listar_usuario(){
+     table = $("#tabla_productos").DataTable({
+       "ordering":false,   
+       "bLengthChange":false,
+       "searching": { "regex": false },
+       "lengthMenu": [ [10, 25, 50, 100, -1], [10, 25, 50, 100, "All"] ],
+       "pageLength": 10,
+       "destroy":true,
+       "async": false ,
+       "processing": true,
+       "ajax":{
+           "url":"./php/controlador_grafico_datatable.php",
+           type:'POST'
+       },
+       "columns":[
+           {"data":"venta_id"},
+           {"data":"nombre"},
+           {"data":"cantidad"},
+           {"data":"stok"},
+           {"data":"vanta_cantidad"},  
+           {"data":"venta_fecharegistro"},
+           {"defaultContent":"<button style='font-size:13px;' type='button' class='editar btn btn-primary'><i class='fa fa-edit'></i></button>&nbsp;<button style='font-size:13px;' type='button' class='desactivar btn btn-danger'><i class='fa fa-trash'></i></button>&nbsp;<button style='font-size:13px;' type='button' class='activar btn btn-success'><i class='fa fa-check'></i></button>"}
+       ],
+
+       "language":idioma_espanol,
+       select: true
+   })
+//    document.getElementById("tabla_productos_filter").style.display="none";
+//    $('input.global_filter').on( 'keyup click', function () {
+//         filterGlobal();
+//     } );
+//     $('input.column_filter').on( 'keyup click', function () {
+//         filterColumn( $(this).parents('tr').attr('data-column') );
+//     });
+
+}
+// function filterGlobal() {
+//     $('#tabla_productos').DataTable().search(
+//         $('#global_filter').val(),
+//     ).draw();
+// }
