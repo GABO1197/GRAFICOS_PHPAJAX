@@ -320,6 +320,15 @@ function Limpiarinput(){
             // placeholder: "Select Category",
             allowClear: true, // This is for clear get the clear button if wanted
             });
+            $('#fecha_fin').select2({
+                // placeholder: "Select Category",
+                allowClear: true, // This is for clear get the clear button if wanted
+                });
+
+                $('#fecha_fin').select2({
+                    // placeholder: "Select Category",
+                    allowClear: true, // This is for clear get the clear button if wanted
+                    });
         });
 }
     
@@ -482,17 +491,17 @@ function listar_usuario(){
        "async": false ,
        "processing": true,
        "ajax":{
-           "url":"./php/controlador_grafico_datatable.php",
+           "url":"php/controlador_grafico_datatable.php",
            type:'POST'
        },
        "columns":[
-           {"data":"venta_id"},
+           {"data":"id"},
            {"data":"nombre"},
            {"data":"cantidad"},
            {"data":"stok"},
            {"data":"vanta_cantidad"},  
            {"data":"venta_fecharegistro"},
-           {"defaultContent":"<button style='font-size:13px;' type='button' class='editar btn btn-primary'><i class='fa fa-edit'></i></button>&nbsp;<button style='font-size:13px;' type='button' class='desactivar btn btn-danger'><i class='fa fa-trash'></i></button>&nbsp;<button style='font-size:13px;' type='button' class='activar btn btn-success'><i class='fa fa-check'></i></button>"}
+           {"defaultContent":"<button style='font-size:13px;' type='button'  class='editar btn btn-primary'><i class='fa fa-edit'></i></button>&nbsp;<button style='font-size:13px;' type='button' class='eliminar btn btn-danger'><i class='fa fa-trash'></i></button>"}
        ],
 
        "language":idioma_espanol,
@@ -507,6 +516,129 @@ function listar_usuario(){
 //     });
 
 }
+// ////////////////////////////esto es para actualizar los productos
+$('#tabla_productos').on('click','.editar',function(){
+    // alert("entro");
+    var data = table.row($(this).parents('tr')).data();
+    if(table.row(this).child.isShown()){
+        var data = table.row(this).data();
+    }
+    $('#modal_editar').modal('show');
+    $('#txt_id').val(data.id);
+    $('#txt_nombre_producto_editar').val(data.nombre);
+    $('#txt_cantidad_producto_editar').val(data.cantidad);
+    $('#txt_cantidad_stok_producto_editar').val(data.stok);
+    $('#txt_venta_cantidad_editar').val(data.vanta_cantidad);
+    $('#txt_fecha_procuto_editar').val(data.venta_fecharegistro);
+})
+
+function Modificar_Datos(){
+    var id = $("#txt_id").val();
+    var nombre= $("#txt_nombre_producto_editar").val();
+    var cantidad = $("#txt_cantidad_producto_editar").val();
+    var stok = $("#txt_cantidad_stok_producto_editar").val();
+    var ventacantidad = $("#txt_venta_cantidad_editar").val();
+    var ventafecha = $("#txt_fecha_procuto_editar").val();
+    if(id.length==0 || nombre.length==0 || cantidad.length==0 || stok.length==0 || ventacantidad.length==0 || ventafecha.length==0 ){
+        return Swal.fire("Mensaje De Advertencia","Llene los campos vacios","warning");
+    }
+    $.ajax({
+        "url":"php/controlador_productos_modificar.php",
+        type:'POST',
+        data:{
+            id:id,
+            nombre:nombre,
+            cantidad:cantidad,
+            stok:stok,
+            ventacantidad:ventacantidad,
+            ventafecha:ventafecha
+        }
+    }).done(function(resp){
+        // alert(resp);
+        if(resp>0){
+            // TraerDatosUsuario();
+                $("#modal_editar").modal('hide');
+                Swal.fire("Mensaje De Confirmacion","Datos actualizados correctamente","success")            
+                .then ( ( value ) =>  {
+                    table.ajax.reload();
+                }); 
+        }else{
+            Swal.fire("Mensaje De Error","no se pudo completar la actualizacion","error");
+        }
+    })
+
+
+}
+// ////////////////////////eliminar el producto
+$('#tabla_productos').on('click','.eliminar',function(){
+    var data = table.row($(this).parents('tr')).data();
+    if(table.row(this).child.isShown()){
+        var data = table.row(this).data();
+    }
+    // alert(data.id);
+    Swal.fire({
+        title: 'Esta seguro de eliminar el producto?',
+        text: "Una vez hecho esto el producto no estara en el sistema",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Si'
+       })
+       .then((result) => {
+        if (result.value) {
+            eliminar_datos(data.id);
+        }
+      })
+})
+
+function eliminar_datos(id){
+    $.ajax({
+        "url":"php/controlador_delete_productos.php",
+        type:'POST',
+        data:{
+            id:id
+        }
+    }).done(function(resp){
+        // alert(resp);
+        if(resp>0){
+            Swal.fire("Mensaje De Confirmacion","EL producto se elimino con exito","success")            
+                .then ( ( value ) =>  {
+                    table.ajax.reload();
+                }); 
+        }
+    })
+}
+// habilitar datosproductos
+$('#tabla_productos').on('click','.habilitar',function(){
+    var data = table.row($(this).parents('tr')).data();
+    if(table.row(this).child.isShown()){
+        var data = table.row(this).data();
+    }
+    // alert(data.id);
+    Swal.fire({
+        title: 'Esta seguro de eliminar el producto?',
+        text: "Una vez hecho esto el producto no estara en el sistema",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Si'
+       })
+       .then((result) => {
+        if (result.value) {
+            eliminar_datos(data.id);
+        }
+      })
+})
+
+
+
+
+
+
+
+
 // function filterGlobal() {
 //     $('#tabla_productos').DataTable().search(
 //         $('#global_filter').val(),
